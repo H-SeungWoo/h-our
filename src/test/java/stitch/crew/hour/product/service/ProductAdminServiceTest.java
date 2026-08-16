@@ -68,12 +68,12 @@ class ProductAdminServiceTest {
         class Context_without_filter {
 
             @Test
-            @DisplayName("It : 상품 목록을 최신순으로 조회")
-            void It_상품_목록을_최신순으로_조회() {
+            @DisplayName("It : 상품 목록을 조회수 내림차순으로 조회")
+            void It_상품_목록을_조회수순으로_조회() {
                 // given
-                Product firstProduct = saveProduct("첫번째 가방", ProductStatus.ACTIVATED, testCategory, todayAt(9));
-                Product thirdProduct = saveProduct("세번째 가방", ProductStatus.SOLD_OUT, testCategory, todayAt(10));
-                Product secondProduct = saveProduct("두번째 가방", ProductStatus.DEACTIVATED, testCategory, todayAt(11));
+                Product firstProduct = saveProduct("첫번째 가방", ProductStatus.ACTIVATED, testCategory, todayAt(9), 3L);
+                Product thirdProduct = saveProduct("세번째 가방", ProductStatus.SOLD_OUT, testCategory, todayAt(10), 10L);
+                Product secondProduct = saveProduct("두번째 가방", ProductStatus.DEACTIVATED, testCategory, todayAt(11), 7L);
 
                 // when
                 Page<AdminProductSearchResponse> response = productAdminService.getProducts(
@@ -89,8 +89,8 @@ class ProductAdminServiceTest {
                 Assertions.assertThat(response.getContent())
                         .extracting(AdminProductSearchResponse::productId)
                         .containsSubsequence(
-                                secondProduct.getId(),
                                 thirdProduct.getId(),
+                                secondProduct.getId(),
                                 firstProduct.getId()
                         );
             }
@@ -322,6 +322,29 @@ class ProductAdminServiceTest {
                 )
         );
         product.switchStatus(status);
+        setProductCreatedAt(product, createdAt);
+
+        return product;
+    }
+
+    private Product saveProduct(
+            String name,
+            ProductStatus status,
+            Category category,
+            LocalDateTime createdAt,
+            Long viewCount
+    ) {
+        Product product = productRepository.save(
+                new Product(
+                        name,
+                        2_000L,
+                        "요약",
+                        "설명",
+                        category
+                )
+        );
+        product.switchStatus(status);
+        product.setViewCount(viewCount);
         setProductCreatedAt(product, createdAt);
 
         return product;

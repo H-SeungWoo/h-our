@@ -53,7 +53,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
                         )
                 ).from(qProduct)
                 .where(booleanBuilder)
-                .orderBy(qProduct.name.desc())
+                .orderBy(qProduct.viewCount.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -88,7 +88,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
                 .join(qProduct.category, qCategory)
                 .fetchJoin()
                 .where(booleanBuilder)
-                .orderBy(qProduct.createdAt.desc())
+                .orderBy(qProduct.viewCount.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();

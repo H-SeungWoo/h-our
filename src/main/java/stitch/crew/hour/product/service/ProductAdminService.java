@@ -20,7 +20,7 @@ import stitch.crew.hour.product.repository.ProductRepository;
 @Transactional(readOnly = true)
 public class ProductAdminService {
 
-    private static final Sort DEFAULT_SORT = Sort.by(Sort.Direction.DESC, "createdAt");
+    private static final Sort DEFAULT_SORT = Sort.by(Sort.Direction.DESC, "viewCount");
 
     private final ProductRepository productRepository;
     private final ImageService imageService;

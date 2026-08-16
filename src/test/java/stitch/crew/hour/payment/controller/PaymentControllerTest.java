@@ -192,6 +192,24 @@ class PaymentControllerTest {
                 .andExpect(jsonPath("$.message").value(SuccessCode.PAYMENT_READ_SUCCESS.getSuccessMessage()))
                 .andExpect(jsonPath("$.data.orderNumber").value(testOrder.getOrderNumber().toString()));
             }
+
+            @Test
+            @DisplayName("It : detail 없는 주문번호 기반 결제 단건 조회도 성공")
+            void It_결제_조회_호환_URL_완료() throws Exception {
+                // given
+                testPayment.switchPaymentStatus(PaymentStatus.COMPLETED);
+                SecurityContextHolder.getContext().setAuthentication(token);
+
+                // when
+                mockMvc.perform(
+                        MockMvcRequestBuilders.get(BASE_URL + "/orders/%s".formatted(testOrder.getOrderNumber()))
+                ).andDo(print())
+
+                // then
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value(SuccessCode.PAYMENT_READ_SUCCESS.getSuccessMessage()))
+                .andExpect(jsonPath("$.data.orderNumber").value(testOrder.getOrderNumber().toString()));
+            }
         }
 
         @Nested

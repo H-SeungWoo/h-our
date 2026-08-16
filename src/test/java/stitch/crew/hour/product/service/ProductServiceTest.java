@@ -238,6 +238,49 @@ class ProductServiceTest {
             }
 
             @Test
+            @DisplayName("It : 상품 목록을 조회수 내림차순으로 조회")
+            void It_상품_목록을_조회수순으로_조회() {
+                // given
+                testProduct.setViewCount(3L);
+                Product highViewProduct = productRepository.save(
+                        new Product(
+                                "조회수 높은 상품",
+                                2000L,
+                                "상품요약",
+                                "설명글",
+                                testCategory
+                        )
+                );
+                highViewProduct.setViewCount(10L);
+                Product middleViewProduct = productRepository.save(
+                        new Product(
+                                "조회수 중간 상품",
+                                2000L,
+                                "상품요약",
+                                "설명글",
+                                testCategory
+                        )
+                );
+                middleViewProduct.setViewCount(7L);
+                SecurityContextHolder.getContext().setAuthentication(token);
+
+                // when
+                Page<ProductSearchResponse> founded = productService.getProductSearch(
+                        PageRequest.of(0, 20),
+                        null
+                );
+
+                // then
+                Assertions.assertThat(founded.getContent())
+                        .extracting(ProductSearchResponse::productId)
+                        .containsExactly(
+                                highViewProduct.getId(),
+                                middleViewProduct.getId(),
+                                testProduct.getId()
+                        );
+            }
+
+            @Test
             @DisplayName("It : 다른 카테고리인 경우 조회 차단")
             void It_상품_조회_없음() {
                 // given

@@ -133,6 +133,33 @@ class OAuth2LoginSuccessHandlerTest {
 			assertThat(payload.userName()).isEqualTo("hihiUser");
 			assertThat(payload.provider()).isEqualTo("GOOGLE");
 		}
+
+		@Test
+		@DisplayName("It: 배포 프론트 URL이 설정되면 해당 주소의 콜백 페이지로 리다이렉트한다")
+		void it_redirects_to_configured_frontend_callback_url() throws Exception {
+			// given
+			ReflectionTestUtils.setField(successHandler, "frontendBaseUrl", "https://www.h-our.shop/");
+			User user = createUser();
+			KeyPair keyPair = new KeyPair("access-token", "refresh-token");
+			OAuth2AuthenticationToken authentication = createOAuthAuthentication(
+				user.getEmail(),
+				"Google User"
+			);
+			MockHttpServletResponse response = new MockHttpServletResponse();
+
+			given(userRepository.findByEmail(user.getEmail())).willReturn(Optional.of(user));
+			given(jwtTokenProvider.issueKeyPair(user.getEmail(), user.getRole())).willReturn(keyPair);
+
+			// when
+			successHandler.onAuthenticationSuccess(
+				new MockHttpServletRequest(),
+				response,
+				authentication
+			);
+
+			// then
+			assertThat(response.getRedirectedUrl()).startsWith("https://www.h-our.shop/oauth/callback");
+		}
 	}
 
 	private OAuth2AuthenticationToken createOAuthAuthentication(

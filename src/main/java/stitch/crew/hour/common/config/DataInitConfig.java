@@ -111,7 +111,7 @@ public class DataInitConfig {
             OrderSearchResponse existingOrder = existingOrders.getContent().getFirst();
             log.info("Sample payment test account: email={}, password={}", SAMPLE_USER_EMAIL, SAMPLE_USER_PASSWORD);
             log.info("Sample payment orderNumber={}", existingOrder.orderNumber());
-            log.info("Sample payment page=/api/payments/orders/{}", existingOrder.orderNumber());
+            log.info("Sample payment page=/api/payments/orders/{}/detail", existingOrder.orderNumber());
             return;
         }
 
@@ -179,7 +179,7 @@ public class DataInitConfig {
 
         log.info("Sample payment test account: email={}, password={}", SAMPLE_USER_EMAIL, SAMPLE_USER_PASSWORD);
         log.info("Sample payment orderNumber={}", order.getOrderNumber());
-        log.info("Sample payment page=/api/payments/orders/{}", order.getOrderNumber());
+        log.info("Sample payment page=/api/payments/orders/{}/detail", order.getOrderNumber());
     }
 
     private void createInitialAdminIfConfigured() {

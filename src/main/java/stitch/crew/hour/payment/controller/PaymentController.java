@@ -260,7 +260,7 @@ public class PaymentController implements PaymentSwaggerSupporter{
         );
     }
 
-    @GetMapping("/orders/{orderNumber}/detail")
+    @GetMapping({"/orders/{orderNumber}/detail", "/orders/{orderNumber}"})
     public ResponseEntity<ApiResponses<PaymentDetailResponse>> getPaymentDetailByOrderNumber(
             @AuthenticationPrincipal CurrentUser currentUser,
             @PathVariable UUID orderNumber

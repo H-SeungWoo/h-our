@@ -3,12 +3,11 @@ package stitch.crew.hour.common.config;
 import java.util.LinkedHashSet;
 import java.util.List;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -27,11 +26,9 @@ import stitch.crew.hour.common.config.entrypoint.JwtAuthenticationEntryPoint;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    @Value("${app.frontend.base-url}")
-    private String frontendBaseUrl;
-
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final ObjectProvider<OAuth2LoginSuccessHandler> oAuth2LoginSuccessHandlerProvider;
     private final ObjectProvider<ClientRegistrationRepository> clientRegistrationRepositoryProvider;
@@ -85,12 +82,20 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource(
         @Value("${app.frontend.base-url:http://localhost:5173}") String frontendBaseUrl
     ) {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.copyOf(new LinkedHashSet<>(List.of(
-            frontendBaseUrl,
+        LinkedHashSet<String> allowedOrigins = new LinkedHashSet<>(List.of(
+            "https://www.h-our.shop",
+            "https://h-our.shop",
             "http://localhost:5173",
             "http://127.0.0.1:5173"
-        ))));
+        ));
+
+        List.of(frontendBaseUrl.split(",")).stream()
+            .map(String::trim)
+            .filter(origin -> !origin.isBlank())
+            .forEach(allowedOrigins::add);
+
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.copyOf(allowedOrigins));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
