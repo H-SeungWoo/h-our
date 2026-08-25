@@ -1,6 +1,7 @@
 package stitch.crew.hour.auth.service;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -87,18 +88,34 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
 	// 회원가입 페이지
 	private String createOAuthSignupRedirectUrl() {
-		return UriComponentsBuilder.fromUriString(frontendBaseUrl+"/signup")
+		return UriComponentsBuilder.fromUriString(getPrimaryFrontendBaseUrl())
+			.path("/signup")
 			.build()
 			.encode()
 			.toUriString();
 	}
 
 	private String createOAuthLoginRedirectUrl(KeyPair keyPair) {
-		return UriComponentsBuilder.fromUriString(frontendBaseUrl + "/oauth/callback")
+		return UriComponentsBuilder.fromUriString(getPrimaryFrontendBaseUrl())
+			.path("/oauth/callback")
 			.queryParam("accessToken", keyPair.accessToken())
 			.queryParam("refreshToken", keyPair.refreshToken())
 			.build()
 			.encode()
 			.toUriString();
+	}
+
+	private String getPrimaryFrontendBaseUrl() {
+		String primaryFrontendBaseUrl = Arrays.stream(frontendBaseUrl.split(","))
+			.map(String::trim)
+			.filter(StringUtils::hasText)
+			.findFirst()
+			.orElseThrow(() -> new IllegalStateException("app.frontend.base-url must not be blank"));
+
+		while (primaryFrontendBaseUrl.endsWith("/")) {
+			primaryFrontendBaseUrl = primaryFrontendBaseUrl.substring(0, primaryFrontendBaseUrl.length() - 1);
+		}
+
+		return primaryFrontendBaseUrl;
 	}
 }
